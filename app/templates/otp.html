@@ -1,0 +1,14 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Xác nhận tài khoản{% endblock %}
+
+{% block content %}
+{% if msg %}
+<div class="alert alert-info mt-3">{{msg}}</div>
+{% endif %}
+<h3 class="text-center m-3">Nhập mã xác thực tài khoản được gửi đến email của bạn</h3>
+<form class="text-center" action="" method="post">
+    <input type="text" class="m-3 form-control justify-content-center d-inline" name="input_otp"  id="otpInput" placeholder="12345" maxlength="5" pattern="\d{5}" required="" style="width: 100px;">
+    <button type="submit" class="btn btn-primary d-block m-auto">Xác nhận mã OTP</button>
+</form>
+{% endblock %}

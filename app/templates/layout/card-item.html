@@ -1,0 +1,23 @@
+<div class="col-xs-12 col-md mt-4">
+    <div class="card {% if s['soluongtonkho'] == 0 %}out_of_stock{% endif %} m-auto"
+         style="width: 192px; position: relative;">
+        <a href="{{url_for('chi_tiet_san_pham', sanpham_id=s['id'])}}" class="text-decoration-none">
+            <img class="card-img-top"
+                 src="{{ s['anhbia'] }}"
+                 alt="Card image" style="height: 271px;">
+        </a>
+        <div class="card-body p-2">
+            <a class="card-title text-dark text-decoration-none mb-1 text-line-clamp"
+               href="{{url_for('chi_tiet_san_pham', sanpham_id=s['id'])}}"
+               style="cursor: pointer;">{{ s['tensanpham'] }}</a>
+            <span class="card-text text-danger mb-2" style="cursor: pointer;">{{ s['gia'] }} VNĐ </span>
+            {% if s['soluongtonkho'] != 0 %}
+            <span class="ms-5 text-dark"
+                  onclick="addToCart('{{s['id']}}', '{{s['tens']}}', {{s['gia']}},{% if current_user.is_authenticated and current_user.user_role|string == 'LoaiTaiKhoan.KHACHHANG' %}{{ current_user.id }}{% else %}''{% endif %}, {{s['soluongtonkho']}}, 1)"><i
+                    class="fa fa-shopping-cart text-hover"
+                    style="font-size:24px;"></i></span>
+            {% endif %}
+        </div>
+
+    </div>
+</div>

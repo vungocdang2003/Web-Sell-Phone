@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Quản lí điện thoại</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+            integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+            crossorigin="anonymous"></script>
+    <link rel="icon" href="{{url_for('static', filename='asset/favicon.ico')}}" type="image/x-icon">
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/nhanvien">Quản lí điện thoại</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active text-hover d-inline-block p-2" href="/nhanvien">Trang chủ</a>
+                </li>
+                {% if current_user.is_authenticated and current_user.user_role|string == "LoaiTaiKhoan.NHANVIEN"%}
+                <li class="nav-item">
+                    <a class="nav-link active text-hover d-inline-block p-2" href="/admin">Thống kê doanh
+                        thu</a>
+                </li>
+                {% endif %}
+            </ul>
+            {% if current_user.is_authenticated and current_user.user_role|string == "LoaiTaiKhoan.NHANVIEN"%}
+            <form class="d-flex me-4" method="get" action="/nhanvien">
+                <input class="form-control me-2" type="text" name="kw" placeholder="Nhập từ khóa...">
+                <button class="btn btn-primary" type="submit">Tìm</button>
+            </form>
+            <a href="{{ url_for('nhan_vien_dang_xuat') }}"
+               class="me-2 text-white text-decoration-none text-hover p-2 d-block">Đăng
+                xuất</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    {% if current_user.is_authenticated and current_user.user_role|string == "LoaiTaiKhoan.NHANVIEN" %}
+    {% if msg %}
+    <div class="alert alert-info mt-3">{{msg}}</div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-7 col-sm-12">
+            <h1 class="text-center text-info mt-1">DANH SÁCH SẢN PHẨM</h1>
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Kho còn lại</th>
+                    <th></th>
+                </tr>
+                {% for s in sanpham %}
+                <tr class="align-middle">
+                    <td><img src="{{ s.anhbia }}" alt="" style="width: 50px; height: 50px;"></td>
+                    <td>{{ s.tensanpham }}</td>
+                    <td>{{ s.gia }}</td>
+                    <td>{{ s.soluongtonkho }}</td>
+                    <td>
+                        <button class="btn btn-danger"
+                                onclick="add_to_gio_sanpham('{{ s.id }}', '{{ s.tensanpham }}', {{ s.gia }})"
+                                {% if s.soluongtonkho== 0 %} disabled {% endif %}
+                        >+
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <ul class="pagination mt-1 justify-content-center">
+                {% for i in range(pages) %}
+                <li class="page-item"><a class="page-link {% if page|int == (i + 1) %}bg-primary text-white{% endif %}"
+                                         href="{{ url_for('nhan_vien', kw=kw, page=i+1) }}">{{
+                    i + 1 }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-5 col-sm-12 d-flex flex-column align-items-center justify-content-center alert alert-info"
+             id="form-thong-tin">
+            <h3>THÔNG TIN ĐƠN HÀNG</h3>
+            <form action="/nhanvien/payment" method="post" class="w-100 p-3" id="form-thanh-toan">
+                <div>
+                    <h3>Tổng số lượng: <span class="cart-counter">{{ total_gio_sanpham.total_quantity }}</span></h3>
+                    <h3>Tổng tiền: <span id="tong_tien" class="cart-amount">{{ "{:,.0f}".format(total_gio_sanpham.total_amount) }}</span>
+                        VNĐ</h3>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="tien" class="h3">NHẬP SỐ TIỀN:</label>
+                    <input onblur="tinh_tien_du()" class="w-100" type="number" id="tien" name="tien" required></input>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="tiendu" class="h3">TIỀN DƯ:</label>
+                    <input class="w-100" type="number" id="tiendu" name="tiendu" readonly></input>
+                </div>
+                <!-- Button Submit -->
+                <div class="text-end">
+                    <button type="button" onclick="lap_hoa_don()" class="btn bg-danger text-white mt-2">Xác nhận mua
+                        hàng
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% if 'giosanpham' in session and session['giosanpham'] %}
+    <table class="table">
+        <tr>
+            <th>Mã sản phẩm</th>
+            <th>Tên sản phẩm</th>
+            <th>Đơn giá</th>
+            <th>Số lượng</th>
+            <th></th>
+        </tr>
+        {% for g in session['giosanpham'].values() %}
+        <tr id="product{{ g.id }}">
+            <td>{{ g.id }}</td>
+            <td>{{ g.name }}</td>
+            <td>{{ "{:,.0f}".format(g.price) }} VNĐ</td>
+            <td>
+                <input type="number" onblur="update_gio_sanpham('{{ g.id }}', this)" value="{{ g.quantity }}"
+                       class="form-control cart-amount"/>
+            </td>
+            <td>
+                <button class="btn btn-danger" onclick="delete_gio_sanpham('{{ g.id }}', this)">&times;</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% else %}
+    <h1 class="text-center text-primary">ĐĂNG NHẬP NHÂN VIÊN</h1>
+    <form method="post" action="/nhanvien/login">
+        <div class="mb-3 mt-3">
+            <label for="username" class="form-label">Tên đăng nhập:</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Tên đăng nhập">
+        </div>
+        <div class="mb-3">
+            <label for="pwd" class="form-label">Mật khẩu:</label>
+            <input type="password" class="form-control" id="pwd" name="password" placeholder="Mật khẩu">
+        </div>
+        <button type="submit" class="btn btn-primary">Đăng nhập</button>
+    </form>
+    {% endif %}
+</div>
+{% include 'layout/footer.html' %}
+{% include 'layout/script.html' %}
+</body>
+</html>

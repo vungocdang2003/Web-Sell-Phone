@@ -1,0 +1,10 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block content %}
+{% if msg %}
+<div class="alert alert-info mt-3">{{msg}}</div>
+{% endif %}
+{% include 'layout/formdangnhap.html' %}
+{% endblock %}

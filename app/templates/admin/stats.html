@@ -1,0 +1,172 @@
+{% extends 'admin/master.html' %}
+{% block head %}
+<link rel="icon" href="{{url_for('static', filename='asset/favicon.ico')}}" type="image/x-icon">
+{% endblock %}
+{% block body %}
+<h1 class="text-center text-info">THỐNG KÊ BÁO CÁO</h1>
+
+<div class="row">
+    <div class="col-md-5 col-xs-12">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Tên sản phẩm</th>
+                <th>Doanh thu</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{s[0]}}</td>
+                <td>{{s[1]}}</td>
+                <td>{{"{:,.0f}".format(s[2])}} VNĐ</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-xs-12">
+        <form class="d-flex me-4" method="get" action="">
+            <input class="form-control me-2" type="text" name="kw" placeholder="Nhập tên sản phẩm...">
+            <button class="btn btn-primary" type="submit">Tìm</button>
+        </form>
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-5 col-xs-12">
+        <table class="table">
+            <tr>
+                <th>Tháng</th>
+                <th>Doanh thu</th>
+
+            </tr>
+            {% for s in mon_stats %}
+            <tr>
+                <td>{{s[0]}}</td>
+                <td>{{"{:,.0f}".format(s[1])}} VNĐ</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-xs-12">
+        <form class="d-flex me-4" method="get" action="">
+            <input class="form-control me-2" type="number" name="year" placeholder="Nhập năm thống kê...">
+            <button class="btn btn-primary" type="submit">Tìm</button>
+        </form>
+        <canvas id="myChart2"></canvas>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-5 col-xs-12">
+        <table class="table">
+            <tr>
+                <th>Năm</th>
+                <th>Doanh thu</th>
+
+            </tr>
+            {% for s in year_stats %}
+            <tr>
+                <td>{{s[0]}}</td>
+                <td>{{"{:,.0f}".format(s[1])}} VNĐ</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-xs-12">
+        <canvas id="myChart3"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let data=[];
+    let labels=[];
+
+    let mData=[];
+    let mLabels=[];
+
+    let yData=[];
+    let yLabels=[];
+
+    {% for s in stats %}
+    data.push({{s[2]}})
+    labels.push('{{s[1]}}')
+    {% endfor %}
+
+    {% for s in mon_stats %}
+    mData.push({{s[1]}})
+    mLabels.push({{s[0]}})
+    {% endfor %}
+    {% for s in year_stats %}
+    yData.push({{s[1]}})
+    yLabels.push({{s[0]}})
+    {% endfor %}
+
+    window.onload = function() {
+      const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '# Doanh thu',
+            data: data,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      const ctx2 = document.getElementById('myChart2');
+
+      new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: mLabels,
+          datasets: [{
+            label: '# Doanh thu',
+            data: mData,
+            borderWidth: 1,
+            backgroundColor: ['red', 'green', 'blue', 'gold', 'brown']
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      const ctx3 = document.getElementById('myChart3');
+      new Chart(ctx3, {
+        type: 'bar',
+        data: {
+          labels: yLabels,
+          datasets: [{
+            label: '# Doanh thu',
+            data: yData,
+            borderWidth: 1,
+            backgroundColor: ['red', 'green', 'blue', 'gold', 'brown']
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+</script>
+{% endblock %}

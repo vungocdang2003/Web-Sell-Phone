@@ -1,0 +1,32 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Quên mật khẩu{% endblock %}
+
+{% block content %}
+{% if msg %}
+<div class="alert alert-info mt-3">{{msg}}</div>
+{% endif %}
+{% if doimatkhau %}
+<h1 class="text-center m-4">Nhập mật khẩu mới</h1>
+<form action="/doimatkhau" method="post" id="form-doi-mat-khau">
+    <div class="form-outline mb-4">
+        <input type="password" id="password" class="form-control form-control-lg mt-2 mb-2"
+               placeholder="Nhập mật khẩu mới..." name="password" required/>
+        <input type="password" id="retype_password" class="form-control form-control-lg mt-2 mb-2"
+               placeholder="Nhập lại mật khẩu mới..." name="retype_password" required/>
+    </div>
+    <button type="button" class="btn btn-primary col-sm-12" style="max-height: 50px;" onclick="confirmPasswords()">Xác nhận
+    </button>
+</form>
+{% else %}
+<h1 class="text-center m-4">Quên mật khẩu</h1>
+<form class="row" action="/quenmatkhau" method="post">
+    <div class="form-outline mb-4 col-md-8 col-sm-12">
+        <input type="email" id="email" class="form-control form-control-lg"
+               placeholder="Nhập địa chỉ email..." name="email"/>
+    </div>
+    <button type="submit" class="btn btn-primary col-md-4 col-sm-12" style="max-height: 50px;">Xác nhận
+    </button>
+</form>
+{% endif %}
+{% endblock %}
